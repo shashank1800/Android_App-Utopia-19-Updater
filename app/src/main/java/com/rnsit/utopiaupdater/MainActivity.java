@@ -30,8 +30,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 
@@ -41,11 +39,12 @@ public class MainActivity extends AppCompatActivity {
     private ImageView iconIv;
     private Uri imageIconURL;
     private ProgressDialog mProgressDialog;
-    private String firebaseImageIconURL;
+    private Uri firebaseImageIconURL;
     private StorageReference mStorageRef;
     private DatabaseReference mDatabaseRef;
     private Context context;
     private EditText postDetail;
+    private PostViewObject postViewObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        firebaseImageIconURL = String.valueOf(taskSnapshot.getDownloadUrl());
+                        firebaseImageIconURL = taskSnapshot.getDownloadUrl();
                         updateDatabase();
 
                     }
@@ -124,18 +123,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateDatabase() {
 
-        final String datetime = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+        final String datetime = new SimpleDateFormat("ss.mm.HH.dd.MM.yyyy").format(new Date());
         final String timeStamp = datetime.replace(".","");
-        final Map<String,String> post = new HashMap<String, String>();
 
-        post.put("postDetail",postDetail.getText().toString());
-        post.put("imagePostURL", String.valueOf(firebaseImageIconURL));
+        postViewObject = new PostViewObject();
+
+        postViewObject.setTimeStamp("-"+timeStamp);
+        postViewObject.setPostDetail(postDetail.getText().toString());
+        postViewObject.setImagePostURL(firebaseImageIconURL.toString());
 
         mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Posts");
         mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mDatabaseRef.getRef().child(timeStamp).setValue(post);
+                mDatabaseRef.push().setValue(postViewObject);
                 mProgressDialog.dismiss();
                 Snackbar.make(findViewById(R.id.relativeLayout), "Uploaded", Snackbar.LENGTH_SHORT).show();
             }
