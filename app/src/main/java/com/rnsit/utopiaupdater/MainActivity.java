@@ -12,15 +12,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog mProgressDialog;
     private Uri firebaseImageIconURL;
     private StorageReference mStorageRef;
+    private FirebaseFirestore db;
     private DatabaseReference mDatabaseRef;
     private Context context;
     private EditText postDetail;
@@ -93,59 +94,64 @@ public class MainActivity extends AppCompatActivity {
         mProgressDialog.show();
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        mStorageRef
-                .child("Images/"+ UUID.randomUUID().toString())
-                .putFile(imageIconURL)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        firebaseImageIconURL = taskSnapshot.getDownloadUrl();
-                        updateDatabase();
+        final StorageReference ref = mStorageRef.child("Images/"+ UUID.randomUUID().toString());
+        UploadTask uploadTask;
+        uploadTask = ref.putFile(imageIconURL);
 
-                    }
-
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Toast.makeText(context,exception.getMessage(),Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                        double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                        mProgressDialog.setProgress((int)progress);
-                    }
-                });
+        uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                mProgressDialog.setProgress((int)progress);
+            }
+        }).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+                return ref.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    firebaseImageIconURL = task.getResult();
+                    updateDatabase();
+                }
+            }
+        });
 
     }
 
     private void updateDatabase() {
 
-        final String datetime = new SimpleDateFormat("ss.mm.HH.dd.MM.yyyy").format(new Date());
+        final String datetime = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
         final String timeStamp = datetime.replace(".","");
 
         postViewObject = new PostViewObject();
 
-        postViewObject.setTimeStamp("-"+timeStamp);
+        postViewObject.setTimeStamp(Long.parseLong(timeStamp));
         postViewObject.setPostDetail(postDetail.getText().toString());
         postViewObject.setImagePostURL(firebaseImageIconURL.toString());
 
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Posts");
-        mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mDatabaseRef.push().setValue(postViewObject);
-                mProgressDialog.dismiss();
-                Snackbar.make(findViewById(R.id.relativeLayout), "Uploaded", Snackbar.LENGTH_SHORT).show();
-            }
+        db = FirebaseFirestore.getInstance();
+        db.collection("Posts")
+                .add(postViewObject)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        mProgressDialog.dismiss();
+                        Snackbar.make(findViewById(R.id.relativeLayout), "Uploaded", Snackbar.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
 
-            }
-        });
 
     }
 }
