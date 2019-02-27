@@ -18,7 +18,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -33,7 +32,7 @@ import java.util.Date;
 import java.util.UUID;
 
 
-public class MainActivity extends AppCompatActivity {
+public class PostActivity extends AppCompatActivity {
     private Button uploadBtn,chooseIconBtn;
     private final int ICON_INTENT = 1;
     private ImageView iconIv;
@@ -42,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     private Uri firebaseImageIconURL;
     private StorageReference mStorageRef;
     private FirebaseFirestore db;
-    private DatabaseReference mDatabaseRef;
     private Context context;
     private EditText postDetail;
     private PostViewObject postViewObject;
@@ -50,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_post);
 
         uploadBtn = (Button)findViewById(R.id.uploadBtn);
         iconIv = (ImageView) findViewById(R.id.iconIv);
@@ -151,7 +149,5 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
-
-
     }
 }
