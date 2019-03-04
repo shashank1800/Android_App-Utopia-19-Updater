@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="planets_array">
+        <item>Merc Mercury</item>
+        <item>Venu Venus</item>
+        <item>Eart Earth</item>
+        <item>Mars Mars</item>
+    </string-array>
+    <string-array name="event_type">
+        <item>Literature</item>
+        <item>Cultural</item>
+        <item>Fun</item>
+    </string-array>
+
+</resources>

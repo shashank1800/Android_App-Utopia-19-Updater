@@ -7,20 +7,32 @@
     android:layout_height="match_parent"
     tools:context=".HomeActivity">
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:orientation="vertical">
         <Button
-            android:id="@+id/update_post"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Update Post" />
-        <Button
             android:id="@+id/update_result"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/colorAccent"
+            android:layout_margin="@dimen/dimen_50dp"
+            android:textSize="@dimen/dimen_20sp"
+            android:textStyle="bold"
+            android:textColor="#fff"
             android:text="Update Result"/>
+        <Button
+            android:id="@+id/update_post"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:layout_margin="@dimen/dimen_50dp"
+            android:textStyle="bold"
+            android:textColor="#fff"
+            android:textSize="@dimen/dimen_20sp"
+            android:text="Update Post" />
     </LinearLayout>
 
 </RelativeLayout>

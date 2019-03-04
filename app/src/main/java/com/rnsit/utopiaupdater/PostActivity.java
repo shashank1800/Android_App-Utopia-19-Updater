@@ -26,6 +26,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.rnsit.utopiaupdater.AdapterObjects.PostViewObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -146,7 +147,7 @@ public class PostActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-
+                        Snackbar.make(findViewById(R.id.relativeLayout),e.getMessage(), Snackbar.LENGTH_SHORT).show();
                     }
                 });
     }

@@ -1,7 +1,6 @@
-package com.rnsit.utopiaupdater;
+package com.rnsit.utopiaupdater.AdapterObjects;
 
 import java.io.Serializable;
-
 
 @SuppressWarnings("serial")
 public class PostViewObject implements Serializable{
@@ -37,5 +36,4 @@ public class PostViewObject implements Serializable{
     public void setImagePostURL(String imagePostURL) {
         this.imagePostURL = imagePostURL;
     }
-
 }
