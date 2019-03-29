@@ -5,7 +5,9 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class SportsObject implements Serializable{
     String eventName,subHead,teamName1,teamName2,winnerName;
-    public SportsObject (String eventName,String subHead,String teamName1,String teamName2,String winnerName){
+    long timeStamp;
+    public SportsObject (long timeStamp,String eventName,String subHead,String teamName1,String teamName2,String winnerName){
+        this.timeStamp =timeStamp;
         this.eventName = eventName;
         this.subHead = subHead;
         this.teamName1=teamName1;
@@ -13,6 +15,14 @@ public class SportsObject implements Serializable{
         this.winnerName = winnerName;
     }
     public SportsObject(){}
+
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
 
     public String getEventName() {
         return eventName;

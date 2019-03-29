@@ -5,12 +5,22 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class TechObject implements Serializable{
     String eventName,partName,teamName;
-    public TechObject (String eventName,String partName,String teamName){
+    long timeStamp;
+    public TechObject (long timeStamp,String eventName,String partName,String teamName){
+        this.timeStamp = timeStamp;
         this.eventName = eventName;
         this.partName = partName;
         this.teamName = teamName;
     }
     public TechObject(){}
+
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
 
     public String getEventName() {
         return eventName;

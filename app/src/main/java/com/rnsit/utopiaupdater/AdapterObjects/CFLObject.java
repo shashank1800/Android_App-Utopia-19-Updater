@@ -3,16 +3,26 @@ package com.rnsit.utopiaupdater.AdapterObjects;
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class CultObject implements Serializable{
+public class CFLObject implements Serializable{
     String eventName,firstName,secondName,firstTeam,secondTeam;
-    public CultObject (String eventName,String firstName,String secondName,String firstTeam,String secondTeam){
+    long timeStamp;
+    public CFLObject(long timeStamp, String eventName, String firstName, String secondName, String firstTeam, String secondTeam){
+        this.timeStamp = timeStamp;
         this.eventName = eventName;
         this.firstName = firstName;
         this.secondName = secondName;
         this.firstTeam = firstTeam;
         this.secondTeam = secondTeam;
     }
-    public CultObject(){}
+    public CFLObject(){}
+
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
 
     public String getEventName() {
         return eventName;

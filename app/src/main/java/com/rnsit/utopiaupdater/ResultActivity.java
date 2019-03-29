@@ -16,23 +16,27 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.rnsit.utopiaupdater.AdapterObjects.CultObject;
+import com.rnsit.utopiaupdater.AdapterObjects.CFLObject;
 import com.rnsit.utopiaupdater.AdapterObjects.SportsObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ResultActivity extends AppCompatActivity implements View.OnClickListener , AdapterView.OnItemSelectedListener {
     private EditText eventName1,firstName1,secondName1;
     private EditText eventName2,subHead;
+
     private Button buttonSubmit1,buttonSubmit2;
+
     private Spinner eventTypeSpinner1,firstTeamSpinner1,secondTeamSpinner1;
     private Spinner firstTeamSpinner2,secondTeamSpinner2,winTeamSpinnner2;
+    private String eventTypeName1,firstTeamName1,secondTeamName1;
+    private String firstTeamName2,secondTeamName2,winTeamName2;
 
     private FirebaseFirestore db;
 
-    private CultObject cultObject;
+    private CFLObject cflObject;
     private SportsObject sportsObject;
-
-    private String eventTypeName1,firstTeamName1,secondTeamName1;
-    private String firstTeamName2,secondTeamName2,winTeamName2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +79,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         secondTeamSpinner2.setAdapter(adapter5);
         winTeamSpinnner2.setAdapter(adapter6);
 
+
         eventTypeSpinner1.setOnItemSelectedListener(this);
         firstTeamSpinner1.setOnItemSelectedListener(this);
         secondTeamSpinner1.setOnItemSelectedListener(this);
@@ -93,6 +98,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
 
         String NameOfEvent1 = "",NameOfFirst1="",NameOfSecond1="";
         String NameOfEvent2 = "",NameOfSubHead2="";
+
         switch (v.getId()){
 
             case R.id.buttonSubmit1:
@@ -106,6 +112,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                 else {
                     Snackbar.make(findViewById(R.id.linearLayout),"Some fields are Empty", Snackbar.LENGTH_SHORT).show();
                 }
+                break;
 
             case R.id.buttonSubmit2:
                 NameOfEvent2 = eventName2.getText().toString();
@@ -117,12 +124,50 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                 else {
                     Snackbar.make(findViewById(R.id.linearLayout),"Some fields are Empty", Snackbar.LENGTH_SHORT).show();
                 }
-
+                break;
         }
     }
 
+    private void submitTypeResult(String NameOfEvent,String NameOfFirst,String NameOfSecond) {
+        final String datetime = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+        final String timeStamp = datetime.replace(".","");
+        eventName1.setText("");
+        firstName1.setText("");
+        secondName1.setText("");
+
+        cflObject = new CFLObject();
+        cflObject.setTimeStamp(Long.parseLong(timeStamp));
+        cflObject.setEventName(NameOfEvent);
+        cflObject.setFirstName(NameOfFirst);
+        cflObject.setSecondName(NameOfSecond);
+        cflObject.setFirstTeam(firstTeamName1);
+        cflObject.setSecondTeam(secondTeamName1);
+
+        db = FirebaseFirestore.getInstance();
+        db.collection(eventTypeName1)
+                .add(cflObject)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Snackbar.make(findViewById(R.id.linearLayout), "Submitted", Snackbar.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Snackbar.make(findViewById(R.id.linearLayout),e.getMessage(), Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
     private void submitSportsResult(String NameOfEvent2, String NameOfSubHead2) {
+        final String datetime = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+        final String timeStamp = datetime.replace(".","");
+        eventName2.setText("");
+        subHead.setText("");
+
         sportsObject = new SportsObject();
+        sportsObject.setTimeStamp(Long.parseLong(timeStamp));
         sportsObject.setEventName(NameOfEvent2);
         sportsObject.setSubHead(NameOfSubHead2);
         sportsObject.setTeamName1(firstTeamName2);
@@ -136,36 +181,6 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Snackbar.make(findViewById(R.id.linearLayout), "Submitted", Snackbar.LENGTH_SHORT).show();
-                        eventName2.setText("");
-                        subHead.setText("");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Snackbar.make(findViewById(R.id.linearLayout),e.getMessage(), Snackbar.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void submitTypeResult(String NameOfEvent,String NameOfFirst,String NameOfSecond) {
-        cultObject = new CultObject();
-        cultObject.setEventName(NameOfEvent);
-        cultObject.setFirstName(NameOfFirst);
-        cultObject.setSecondName(NameOfSecond);
-        cultObject.setFirstTeam(firstTeamName1);
-        cultObject.setSecondTeam(secondTeamName1);
-
-        db = FirebaseFirestore.getInstance();
-        db.collection(eventTypeName1)
-                .add(cultObject)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Snackbar.make(findViewById(R.id.linearLayout), "Submitted", Snackbar.LENGTH_SHORT).show();
-                        eventName1.setText("");
-                        firstName1.setText("");
-                        secondName1.setText("");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

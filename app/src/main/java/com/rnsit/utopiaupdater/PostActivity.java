@@ -6,12 +6,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,6 +31,7 @@ import com.google.firebase.storage.UploadTask;
 import com.google.android.material.snackbar.Snackbar;
 import com.rnsit.utopiaupdater.AdapterObjects.PostViewObject;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -45,6 +49,7 @@ public class PostActivity extends AppCompatActivity {
     private Context context;
     private EditText postDetail;
     private PostViewObject postViewObject;
+    public static final int PICK_IMAGE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,15 +67,20 @@ public class PostActivity extends AppCompatActivity {
         chooseIconBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                startActivityForResult(intent,ICON_INTENT);
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
             }
         });
 
         uploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                uploadFunction();
+                if(!postDetail.getText().toString().equals(""))
+                    uploadFunction();
+                else
+                    Toast.makeText(context,"Post text is empty",Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -96,6 +106,7 @@ public class PostActivity extends AppCompatActivity {
         final StorageReference ref = mStorageRef.child("Images/"+ UUID.randomUUID().toString());
         UploadTask uploadTask;
         uploadTask = ref.putFile(imageIconURL);
+
 
         uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -142,6 +153,7 @@ public class PostActivity extends AppCompatActivity {
                     public void onSuccess(DocumentReference documentReference) {
                         mProgressDialog.dismiss();
                         Snackbar.make(findViewById(R.id.relativeLayout), "Uploaded", Snackbar.LENGTH_SHORT).show();
+                        finish();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
